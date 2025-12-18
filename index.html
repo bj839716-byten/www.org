@@ -3,54 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM_FAILURE // SBU</title>
-    <link rel="stylesheet" href="style.css">
+    <title>VOID_RUNNER // PROTOCOL_0</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root { --p: #0f0; --s: #f0f; --bg: #000; }
+        
+        body {
+            margin: 0; background: var(--bg); color: var(--p);
+            font-family: 'VT323', monospace; height: 5000px; overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* --- BACKGROUND LAYERS --- */
+        #starCanvas { position: fixed; top: 0; left: 0; z-index: -2; }
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; opacity: 0.4; }
+        
+        .scanlines {
+            position: fixed; inset: 0; z-index: 100; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+        }
+
+        /* --- UI ANIMATIONS --- */
+        #app { position: relative; z-index: 10; transition: transform 0.1s ease-out; }
+        .screen-box { height: 100vh; width: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
+
+        .window {
+            position: absolute; background: rgba(0, 15, 0, 0.95);
+            border: 1px solid var(--p); min-width: 320px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            animation: flicker 4s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.98; }
+            5% { opacity: 0.85; transform: translateX(-1px); }
+            10% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 1; }
+        }
+
+        .title-bar { 
+            background: var(--p); color: #000; padding: 5px 12px; 
+            cursor: grab; font-weight: bold; display: flex; justify-content: space-between;
+        }
+
+        .window-content { padding: 20px; }
+
+        /* --- TECH CONTENT STYLES --- */
+        .code-block {
+            background: rgba(0,0,0,0.8); border-left: 3px solid var(--s);
+            padding: 10px; margin: 10px 0; font-size: 0.9rem;
+            color: #ccc; position: relative; overflow: hidden;
+        }
+
+        .progress-container { margin: 15px 0; }
+        .progress-bar {
+            height: 8px; border: 1px solid var(--p); position: relative;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        .progress-fill {
+            height: 100%; background: var(--p); width: 0%;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--p);
+        }
+
+        /* --- INTERACTIVE BUTTON --- */
+        .btn-test {
+            border: 1px solid var(--p); background: transparent; color: var(--p);
+            padding: 10px; width: 100%; cursor: pointer; font-family: 'VT323';
+            text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        .btn-test:hover { background: var(--p); color: #000; box-shadow: 0 0 20px var(--p); }
+
+        h2 { margin-top: 0; color: var(--s); text-shadow: 0 0 5px var(--s); }
+
+    </style>
 </head>
 <body>
 
+    <canvas id="starCanvas"></canvas>
+    <div id="canvas-container"></div>
     <div class="scanlines"></div>
-    <div class="noise"></div>
-    <div class="screen-overlay"></div>
 
     <main id="app">
-        
-        <div class="bg-text">
-            FATAL ERROR<br>REALITY.SYS CORRUPTED<br>REBOOTING...
-        </div>
-
-        <div class="window draggable" style="top: 10%; left: 5%; z-index: 10;">
-            <div class="title-bar">/// WARNING: UNSTABLE_USER ///</div>
-            <div class="window-content">
-                <h1 class="mega-glitch" data-text="I_AM_THE_GLITCH">I_AM_THE_GLITCH</h1>
-                <p class="scramble">Welcome to my digital wasteland. Nothing here is safe.</p>
-            </div>
-        </div>
-
-        <div class="window draggable" style="top: 40%; right: 10%; z-index: 9; width: 350px;">
-            <div class="title-bar">/// CORRUPTED_PROJECTS_LOG ///</div>
-            <div class="window-content">
-                <ul>
-                    <li>> PROJECT_ZERO: <span class="highlight">FAILED</span></li>
-                    <li>> CHAOS_ENGINE_V2: <span class="highlight">ACTIVE</span></li>
-                    <li>> REALITY_BREACH: <span class="highlight">LOADING...</span></li>
-                </ul>
-                <a href="#" class="brutal-btn">INITIATE_FORCED_ENTRY</a>
-            </div>
-        </div>
-
-        <div class="window draggable" style="bottom: 10%; left: 20%; z-index: 11;">
-            <div class="title-bar">/// SEND_TRANSMISSION ///</div>
-            <div class="window-content">
-                <p class="scramble">Don't try to find me. I will find you.</p>
-                <div class="links">
-                    <a href="#">[GITHUB]</a> <a href="#">[TWITTER]</a> <a href="#">[VOID]</a>
+        <section class="screen-box">
+            <div class="window draggable" style="width: 450px;">
+                <div class="title-bar"><span>TERMINAL // DEV_LOG</span> <span>[X]</span></div>
+                <div class="window-content">
+                    <h2>CODING_PROTOCOLS</h2>
+                    <div class="code-block" id="typewriter">
+                        // INITIALIZING KERNEL...
+                    </div>
+                    <p>Clean code isn't just a preference—it's a requirement for high-load systems. Modular logic prevents total failure.</p>
                 </div>
             </div>
-        </div>
-
+        </section>
+        
+        <section class="screen-box">
+            <div class="window draggable" style="width: 380px;">
+                <div class="title-bar"><span>TEST_SUITE // AUTO_V2</span> <span>[X]</span></div>
+                <div class="window-content">
+                    <h2>TESTING_METRICS</h2>
+                    <div class="progress-container">
+                        <small>UNIT_TESTS: PASSING</small>
+                        <div class="progress-bar"><div class="progress-fill" id="fill-1"></div></div>
+                    </div>
+                    <div class="progress-container">
+                        <small>E2E_LATENCY: OPTIMAL</small>
+                        <div class="progress-bar"><div class="progress-fill" id="fill-2"></div></div>
+                    </div>
+                    <button class="btn-test" onclick="runDiagnostic()">START_AUTOMATION_CYCLE</button>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        // --- 1. CORE ENGINES (Stars & Tunnel) ---
+        const sCanvas = document.getElementById('starCanvas');
+        const sCtx = sCanvas.getContext('2d');
+        let w, h;
+        const setSize = () => { w = sCanvas.width = window.innerWidth; h = sCanvas.height = window.innerHeight; };
+        window.addEventListener('resize', setSize);
+        setSize();
+
+        let mouse = { x: w/2, y: h/2, vx: 0, vy: 0, lastX: 0, lastY: 0, down: false };
+        window.addEventListener('mousedown', () => mouse.down = true);
+        window.addEventListener('mouseup', () => mouse.down = false);
+        window.addEventListener('mousemove', e => {
+            mouse.vx = e.clientX - mouse.lastX; mouse.vy = e.clientY - mouse.lastY;
+            mouse.lastX = e.clientX; mouse.lastY = e.clientY;
+            mouse.x = e.clientX; mouse.y = e.clientY;
+        });
+
+        const stars = Array.from({length: 300}, () => ({
+            x: Math.random() * w, y: Math.random() * h,
+            vx: 0, vy: 0, p: Math.random() * 1.5 + 0.2, size: Math.random() * 2 + 1
+        }));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(w, h);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const tunnel = new THREE.Mesh(
+            new THREE.CylinderGeometry(5, 5, 120, 24, 20, true),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true, side: THREE.DoubleSide })
+        );
+        tunnel.rotation.x = Math.PI / 2;
+        scene.add(tunnel);
+        camera.position.z = 15;
+
+        // --- 2. TECH ANIMATION LOGIC ---
+        const typewriterContent = [
+            "const data = await fetch('void://node_0');",
+            "expect(response.status).toBe(200);",
+            "void.inject(payload); // Safe execution",
+            "// System stable. No leaks detected."
+        ];
+        let typeIdx = 0;
+        let charIdx = 0;
+        const terminal = document.getElementById('typewriter');
+
+        function type() {
+            if (charIdx < typewriterContent[typeIdx].length) {
+                terminal.innerHTML += typewriterContent[typeIdx].charAt(charIdx);
+                charIdx++;
+                setTimeout(type, 50);
+            } else {
+                setTimeout(() => {
+                    terminal.innerHTML = "> ";
+                    charIdx = 0;
+                    typeIdx = (typeIdx + 1) % typewriterContent.length;
+                    type();
+                }, 2000);
+            }
+        }
+        type();
+
+        function runDiagnostic() {
+            document.getElementById('fill-1').style.width = "94%";
+            document.getElementById('fill-2').style.width = "88%";
+            const btn = document.querySelector('.btn-test');
+            btn.innerHTML = "CYCLING...";
+            setTimeout(() => { btn.innerHTML = "SUITE_GREEN"; }, 2000);
+        }
+
+        // --- 3. MAIN GLOBAL LOOP ---
+        let lastScroll = window.scrollY;
+
+        function animate() {
+            sCtx.fillStyle = 'black';
+            sCtx.fillRect(0,0,w,h);
+            
+            stars.forEach(s => {
+                let dx = s.x - mouse.x; let dy = s.y - mouse.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                let force = (mouse.down ? 800 : 400);
+                if(dist < force) {
+                    let strength = (1 - dist/force) * (mouse.down ? 8 : 1);
+                    s.vx += mouse.vx * 0.01 * strength;
+                    s.vy += mouse.vy * 0.01 * strength;
+                }
+                s.x += (s.vx + 0.2) * s.p; s.y += (s.vy + 0.1) * s.p;
+                s.vx *= 0.97; s.vy *= 0.97;
+                if(s.x<0) s.x=w; if(s.x>w) s.x=0; if(s.y<0) s.y=h; if(s.y>h) s.y=0;
+                sCtx.fillStyle = mouse.down ? `hsl(300, 100%, 70%)` : `hsl(120, 100%, 70%)`;
+                sCtx.beginPath(); sCtx.arc(s.x, s.y, s.size, 0, Math.PI*2); sCtx.fill();
+            });
+
+            let scrollVel = window.scrollY - lastScroll;
+            lastScroll = window.scrollY;
+            tunnel.position.y = window.scrollY * 0.04;
+            tunnel.rotation.z += 0.005 + (Math.abs(scrollVel) * 0.001);
+            
+            const app = document.getElementById('app');
+            if(Math.abs(scrollVel) > 1) {
+                app.style.transform = `skewY(${scrollVel * 0.1}deg)`;
+            } else { app.style.transform = 'none'; }
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Draggable Logic
+        let activeWin = null; let offset = [0,0];
+        document.addEventListener('mousedown', e => {
+            if (e.target.closest('.title-bar')) {
+                activeWin = e.target.closest('.window');
+                offset = [activeWin.offsetLeft - e.clientX, activeWin.offsetTop - e.clientY];
+                activeWin.style.zIndex = 1000;
+            }
+        });
+        document.addEventListener('mousemove', e => {
+            if (activeWin) {
+                activeWin.style.left = (e.clientX + offset[0]) + 'px';
+                activeWin.style.top = (e.clientY + offset[1]) + 'px';
+            }
+        });
+        document.addEventListener('mouseup', () => activeWin = null);
+    </script>
 </body>
 </html>
